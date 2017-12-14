@@ -1,7 +1,3 @@
-
-package minesweeper;
-
-
 import javafx.application.Application;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
