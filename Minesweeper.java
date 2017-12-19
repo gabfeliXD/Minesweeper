@@ -9,7 +9,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-
+import javafx.scene.input.MouseEvent
+import javafx.scene.input.MouseButton
 
 public class Minesweeper extends Application{
     
@@ -28,9 +29,11 @@ public class Minesweeper extends Application{
     public void start(Stage primaryStage) throws Exception {
     stage = primaryStage;
     
-    HBox menu = new HBox();
-    GridPane grid = new GridPane();
+    HBox menu = new HBox(10);
+    menu.setPadding(new Insets(10, 10, 10, 10));
+    menu.setStyle("-fx-background-color: blue");
 
+    GridPane grid = new GridPane();
     grid.setPadding(new Insets(20, 20, 20, 20));
     grid.setHgap(2);
     grid.setVgap(2);
@@ -55,11 +58,17 @@ public class Minesweeper extends Application{
             final int xx = x;
             final int yy = y;
             button.setOnAction(e -> reveal(button.getText(), xx, yy));
+            button.setOnMouseClicked(e -> {
+		MouseButton button = event.getButton();
+		if(button==MouseButton.SECONDARY){
+			setFlag();	
+		}
+	    }
         }
     }
     
     Button menuButton = new Button("menuButton"); 
-    
+    menu.getChildren().add(menuButton); 
 
     BorderPane border = new BorderPane();
     border.setCenter(grid);
@@ -70,7 +79,18 @@ public class Minesweeper extends Application{
     stage.setScene(new Scene(scrollPane));
     stage.show();
     }
+
+    public void setFlag(int hIndex, int vIndex){
+	
+	if(Board.flags[hIndex][vIndex] == 0){
+		Board.flags[hIndex][vIndex] = 1;	
+	}
+	else if(Board.flags[hIndex][vIndex] == 1){
+		Board.flags[hIndex][vIndex] = 0;	
+	}
+	
     
+
     public void reveal(String text, int hIndex, int vIndex){
         if (!"-1".equals(text)){
             
