@@ -1,7 +1,3 @@
-
-package minesweeper;
-
-
 import javafx.application.Application;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -33,15 +29,11 @@ public class Minesweeper extends Application{
     stage = primaryStage;
     
     HBox menu = new HBox();
-    
     GridPane grid = new GridPane();
+
     grid.setPadding(new Insets(20, 20, 20, 20));
     grid.setHgap(2);
     grid.setVgap(2);
-    
-    BorderPane border = new BorderPane();
-    border.setCenter(grid);
-
     
     
     buttons = new Button[Board.horizontalTiles][Board.verticalTiles];
@@ -66,10 +58,14 @@ public class Minesweeper extends Application{
         }
     }
     
-    
+    Button menuButton = new Button("menuButton"); 
     
 
-    ScrollPane scrollPane = new ScrollPane(grid);
+    BorderPane border = new BorderPane();
+    border.setCenter(grid);
+    border.setTop(menu);
+
+    ScrollPane scrollPane = new ScrollPane(border);
 
     stage.setScene(new Scene(scrollPane));
     stage.show();

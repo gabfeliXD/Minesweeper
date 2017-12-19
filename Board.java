@@ -1,6 +1,3 @@
-
-package minesweeper;
-
 import java.util.Random;
 
 public class Board {
