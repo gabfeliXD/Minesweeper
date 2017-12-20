@@ -6,7 +6,9 @@ public class Board {
     public static int verticalTiles = 10;
     public static int[][] mineField;
     public static Random rand = new Random();
-    public int[][] flags;
+    public static int[][] flagsMap;
+    public static int flags;
+    
     
     //Creates the board
     public static void setBoard(){
@@ -16,7 +18,8 @@ public class Board {
         setMines();
         
         setNumbers();
-	initializeFlagSystem()
+
+	initializeFlagSystem();
     }
     
     //Initialize the board
@@ -69,12 +72,12 @@ public class Board {
         }
     }
 
-    public static void initializeFlags(){
-	flags = new int[horizontalTiles][VerticalTiles];
+    public static void initializeFlagSystem(){
+	flagsMap = new int[horizontalTiles][verticalTiles];
 
 	for (int x = 0; x < horizontalTiles; x++) {
         	for (int y = 0; y < verticalTiles; y++) {
-            		flags[x][y] = 0;
+            		flagsMap[x][y] = 0;
 	    }
         }
 	    
