@@ -14,14 +14,10 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Pos;
 import javafx.stage.Modality;
+import javafx.stage.StageStyle;
 
 public class Minesweeper extends Application{
     
-    public static void main(String[] args) {
-        Board.setBoard();
-        launch(args);    
-    }
-
     Stage stage;
     Scene welcomeScene, minesweeperScene;
     String unrevealedStyle = "-fx-background-color: black; -fx-text-fill: transparent;";
@@ -30,12 +26,16 @@ public class Minesweeper extends Application{
     Button[][] buttons;
     Label flagsHUD;
     
+    public static void main(String[] args) {
+        Board.setBoard();
+        launch(args);    
+    }
+    
     @Override
     public void start(Stage primaryStage) throws Exception {
     stage = primaryStage;
     stage.setTitle("Minesweeper");
     
-    setMinesweeperScene();
     setWelcomeScene();
     
     stage.setResizable(false);
@@ -47,7 +47,10 @@ public class Minesweeper extends Application{
         VBox menu = new VBox();
         Label title = new Label("Minesweeper");
         Button play = new Button("Play");
-        play.setOnAction(e -> stage.setScene(minesweeperScene));
+        play.setOnAction(e -> {    
+            setMinesweeperScene();
+            stage.setScene(minesweeperScene);
+        });
         Button seeScores = new Button("See Highscores");
         Button quit = new Button("Exit Game");
         quit.setOnAction(e -> stage.close());
@@ -150,7 +153,7 @@ public class Minesweeper extends Application{
                 checkVictory();
 
             }else{
-                lose();
+                lost();
             }
         }
     }
@@ -171,7 +174,7 @@ public class Minesweeper extends Application{
         }
     }
     
-    public void lose(){
+    public void lost(){
         for (int x = 0; x < Board.horizontalTiles; x++) {
             for (int y = 0; y < Board.verticalTiles; y++) {
                 buttons[x][y].setStyle(revealedStyle);
@@ -188,17 +191,25 @@ public class Minesweeper extends Application{
             }
         }
         
+        boolean choice = displayLostBox("Minesweeper", "You lost... want to try again?");
         
+        if(choice){
+            Board.setBoard();
+            setMinesweeperScene();
+            stage.setScene(minesweeperScene);
+        }
+        else{
+            stage.setScene(welcomeScene);
+        }
     }
     
     public void win(){
         System.out.println("Vc venceu!");
     }
    
-    public boolean lostBox(String title, String message){
-        
-        boolean choice = false;
-        
+    static boolean answer;
+    
+    public static boolean displayLostBox(String title, String message){ 
         Stage window = new Stage();
         
         window.initModality(Modality.APPLICATION_MODAL);
@@ -207,28 +218,30 @@ public class Minesweeper extends Application{
         
         Label label = new Label();
         label.setText(message);
-        Button menuButton = new Button("Go back to menu");
-        Button resetButton = new Button("Play Again!");
-        menuButton.setOnAction(e -> {
+        Button no = new Button("Nah");
+        Button yes = new Button("Sure!");
+        no.setOnAction(e -> {
             window.close();
+            answer = false;
             
         });
         
-        resetButton.setOnAction(e -> {
+        yes.setOnAction(e -> {
             window.close();
-                });
+            answer = true;
+        });
         
         
         VBox layout = new VBox(10);
-        layout.getChildren().addAll(label, menuButton);
+        layout.getChildren().addAll(label, yes, no);
         layout.setAlignment(Pos.CENTER);
         
         Scene scene = new Scene(layout);
-        window.setScene(scene);  
+        window.setScene(scene);
+        window.initStyle(StageStyle.UNDECORATED);
         window.showAndWait();
         
-        return choice;
-        
+        return answer;   
     }
     
 }
