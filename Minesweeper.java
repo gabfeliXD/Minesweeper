@@ -1,3 +1,6 @@
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -12,9 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
-import javafx.geometry.Pos;
-import javafx.stage.Modality;
-import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 public class Minesweeper extends Application{
     
@@ -24,7 +25,12 @@ public class Minesweeper extends Application{
     String revealedStyle = "";
     String flagStyle  = "-fx-background-color: red; -fx-text-fill: transparent;";
     Button[][] buttons;
+    
     Label flagsHUD;
+    Button resetButton;
+    Label Timer;
+    
+    Timeline timeline;
     
     public static void main(String[] args) {
         Board.setBoard();
@@ -44,6 +50,7 @@ public class Minesweeper extends Application{
     }
     
     public void setWelcomeScene(){
+
         VBox menu = new VBox();
         Label title = new Label("Minesweeper");
         Button play = new Button("Play");
@@ -56,13 +63,16 @@ public class Minesweeper extends Application{
         quit.setOnAction(e -> stage.close());
         
         menu.getChildren().addAll(title, play, seeScores, quit);
-        welcomeScene = new Scene(menu);            
+        welcomeScene = new Scene(menu); 
+        
     }
 
     public void setMinesweeperScene(){
-        HBox menu = new HBox(10);
-        //menu.setPadding(new Insets(10, 10, 10, 10));
+        long startTime = System.currentTimeMillis();
 
+        HBox menu = new HBox(10);
+        menu.setPadding(new Insets(20, 20, 5, 20));
+	menu.setSpacing(30);
         GridPane grid = new GridPane();
         grid.setPadding(new Insets(20, 20, 20, 20));
         grid.setHgap(2);
@@ -89,7 +99,8 @@ public class Minesweeper extends Application{
                 final int yy = y;
                 button.setOnAction(e -> reveal(button.getText(), xx, yy));
                 button.setOnMouseClicked((MouseEvent event) -> {
-                    MouseButton button1 = event.getButton();
+	        MouseButton button1 = event.getButton();
+
                     if (button1 == MouseButton.PRIMARY) {
                         reveal(button.getText(), xx, yy);
                     } else if (button1 == MouseButton.SECONDARY) {
@@ -98,30 +109,49 @@ public class Minesweeper extends Application{
                 });
             }
         }
+        
+        resetButton = new Button("Back to Menu"); 
+        
+        flagsHUD = new Label("Flags:\n   " + String.valueOf(Board.flags));
+        
+        Timer = new Label("Time: \n   " + String.valueOf(0) + " : "+ String.valueOf(0));
+	
+        
+	resetButton.setOnAction(e -> {
+            setWelcomeScene();
+            stage.setScene(welcomeScene);
+        });
 
-        flagsHUD = new Label(String.valueOf(Board.flags)); 
-        menu.getChildren().add(flagsHUD);
+        menu.getChildren().addAll(resetButton, flagsHUD, Timer);
+        
+        timeline = new Timeline(new KeyFrame(
+        Duration.millis(1000),
+            ae -> displaySeconds(startTime)));
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+        
 
         BorderPane border = new BorderPane();
         border.setCenter(grid);
         border.setTop(menu);
 
         minesweeperScene = new Scene(border);
+ 
     }
     
     public void setFlag(int hIndex, int vIndex){	
-		if(Board.flagsMap[hIndex][vIndex] == 0 && Board.flags < Board.totalMines){
+		if(Board.flagsMap[hIndex][vIndex] == 0 && Board.flags <= Board.totalMines && Board.flags > 0){
 			Board.flagsMap[hIndex][vIndex] = 1;	
 			buttons[hIndex][vIndex].setStyle(flagStyle);
-			Board.flags += 1;
+			Board.flags -= 1;
 		}
 		else if(Board.flagsMap[hIndex][vIndex] == 1){
 			Board.flagsMap[hIndex][vIndex] = 0;	
 			buttons[hIndex][vIndex].setStyle(unrevealedStyle);
-			Board.flags -= 1;
+			Board.flags += 1;
 		}
                 
-	flagsHUD.setText(String.valueOf(Board.flags));
+	flagsHUD.setText("Flags:\n   " + String.valueOf(Board.flags));
     }   
 
     public void reveal(String text, int hIndex, int vIndex){
@@ -189,59 +219,22 @@ public class Minesweeper extends Application{
                     buttons[x][y].setText("");
                 }
             }
+	resetButton.setText("Try Again!");
         }
-        
-        boolean choice = displayLostBox("Minesweeper", "You lost... want to try again?");
-        
-        if(choice){
-            Board.setBoard();
-            setMinesweeperScene();
-            stage.setScene(minesweeperScene);
-        }
-        else{
-            stage.setScene(welcomeScene);
-        }
+  
     }
     
     public void win(){
         System.out.println("Vc venceu!");
     }
-   
-    static boolean answer;
     
-    public static boolean displayLostBox(String title, String message){ 
-        Stage window = new Stage();
+    public void displaySeconds(long startTime){
+                long elapsedTime = System.currentTimeMillis() - startTime;
+                long elapsedSeconds = elapsedTime / 1000;
+                long secondsDisplay = elapsedSeconds % 60;
+                long elapsedMinutes = elapsedSeconds / 60;
         
-        window.initModality(Modality.APPLICATION_MODAL);
-        window.setTitle(title);
-        window.setMinWidth(250);
-        
-        Label label = new Label();
-        label.setText(message);
-        Button no = new Button("Nah");
-        Button yes = new Button("Sure!");
-        no.setOnAction(e -> {
-            window.close();
-            answer = false;
-            
-        });
-        
-        yes.setOnAction(e -> {
-            window.close();
-            answer = true;
-        });
-        
-        
-        VBox layout = new VBox(10);
-        layout.getChildren().addAll(label, yes, no);
-        layout.setAlignment(Pos.CENTER);
-        
-        Scene scene = new Scene(layout);
-        window.setScene(scene);
-        window.initStyle(StageStyle.UNDECORATED);
-        window.showAndWait();
-        
-        return answer;   
+                Timer.setText("Time: \n " + String.valueOf(elapsedMinutes) + " : "+ String.valueOf(secondsDisplay));          
     }
-    
+     
 }
