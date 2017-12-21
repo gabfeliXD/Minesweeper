@@ -7,7 +7,7 @@ public class Board {
     public static int[][] mineField;
     public static Random rand = new Random();
     public static int[][] flagsMap;
-    public static int flags;
+    public static int flags = totalMines;
     
     
     //Creates the board
