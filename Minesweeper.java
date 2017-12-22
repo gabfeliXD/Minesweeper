@@ -5,9 +5,11 @@ import javafx.application.Application;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -15,15 +17,18 @@ import javafx.scene.layout.HBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.util.Duration;
 
 public class Minesweeper extends Application{
     
     Stage stage;
-    Scene welcomeScene, minesweeperScene;
+    Scene welcomeScene, minesweeperScene, highscoreScene;
+    
     String unrevealedStyle = "-fx-background-color: black; -fx-text-fill: transparent;";
     String revealedStyle = "";
     String flagStyle  = "-fx-background-color: red; -fx-text-fill: transparent;";
+    
     Button[][] buttons;
     
     Label flagsHUD;
@@ -31,9 +36,13 @@ public class Minesweeper extends Application{
     Label Timer;
     
     Timeline timeline;
+    long startTime;
+    
+    String[][] winners = new String[10][2];
+    String winnerName;
+    String time;
     
     public static void main(String[] args) {
-        Board.setBoard();
         launch(args);    
     }
     
@@ -41,34 +50,42 @@ public class Minesweeper extends Application{
     public void start(Stage primaryStage) throws Exception {
     stage = primaryStage;
     stage.setTitle("Minesweeper");
+    stage.setWidth(360);
+    stage.setHeight(445);
+    stage.setResizable(false);
+    
     
     setWelcomeScene();
-    
-    stage.setResizable(false);
+   
     stage.setScene(welcomeScene);
     stage.show();
     }
     
     public void setWelcomeScene(){
-
-        VBox menu = new VBox();
+        
+        VBox menu = new VBox(30);
+        menu.setAlignment(Pos.CENTER);
         Label title = new Label("Minesweeper");
         Button play = new Button("Play");
-        play.setOnAction(e -> {    
+        play.setOnAction(e -> {
+            Board.setBoard();
             setMinesweeperScene();
             stage.setScene(minesweeperScene);
         });
         Button seeScores = new Button("See Highscores");
+        setHighscoreScene();
+        seeScores.setOnAction(e -> stage.setScene(highscoreScene));
+        
         Button quit = new Button("Exit Game");
         quit.setOnAction(e -> stage.close());
         
         menu.getChildren().addAll(title, play, seeScores, quit);
-        welcomeScene = new Scene(menu); 
-        
+        welcomeScene = new Scene(menu);
+          
     }
 
     public void setMinesweeperScene(){
-        long startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis();
 
         HBox menu = new HBox(10);
         menu.setPadding(new Insets(20, 20, 5, 20));
@@ -77,7 +94,6 @@ public class Minesweeper extends Application{
         grid.setPadding(new Insets(20, 20, 20, 20));
         grid.setHgap(2);
         grid.setVgap(2);
-
 
         buttons = new Button[Board.horizontalTiles][Board.verticalTiles];
 
@@ -115,8 +131,7 @@ public class Minesweeper extends Application{
         flagsHUD = new Label("Flags:\n   " + String.valueOf(Board.flags));
         
         Timer = new Label("Time: \n   " + String.valueOf(0) + " : "+ String.valueOf(0));
-	
-        
+	        
 	resetButton.setOnAction(e -> {
             setWelcomeScene();
             stage.setScene(welcomeScene);
@@ -130,13 +145,30 @@ public class Minesweeper extends Application{
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
         
-
         BorderPane border = new BorderPane();
         border.setCenter(grid);
         border.setTop(menu);
 
         minesweeperScene = new Scene(border);
  
+    }
+    
+    public void setHighscoreScene(){
+        VBox highscores = new VBox(30);
+        
+        Label title = new Label("Highscores:");
+        
+        highscores.getChildren().add(title);
+        
+        
+        Button backToMenu = new Button("Back to Menu");
+        backToMenu.setOnAction(e -> stage.setScene(welcomeScene));
+        
+        highscores.getChildren().add(backToMenu);
+        
+        highscores.setAlignment(Pos.CENTER);
+        
+        highscoreScene = new Scene(highscores);
     }
     
     public void setFlag(int hIndex, int vIndex){	
@@ -225,9 +257,44 @@ public class Minesweeper extends Application{
     }
     
     public void win(){
-        System.out.println("Vc venceu!");
+        time = Timer.getText().replace("Time: \n " , "");
+                
+        Stage window = new Stage();
+        
+        window.initModality(Modality.APPLICATION_MODAL);
+        window.setTitle("Congatulations!");
+        window.setMinWidth(250);
+        
+        Label label = new Label();
+        label.setText("Write Your Name:");
+        TextField textField = new TextField ();
+        Button closeButton = new Button("Close the window");
+        closeButton.setOnAction(e -> {
+            winnerName = textField.getText();
+            window.close();
+            
+            compareWinners(winnerName, time);
+            
+            });
+        
+        VBox layout = new VBox(10);
+        layout.getChildren().addAll(label, closeButton);
+        layout.setAlignment(Pos.CENTER);
+        
+        Scene scene = new Scene(layout);
+        window.setScene(scene);  
+        window.showAndWait();
     }
     
+    public void compareWinners(String name, String time){
+        for(int i = 0; i < winners[1].length; i++){
+            if(Integer.parseInt(winners[i][2]) < Integer.parseInt(time)){
+                winners[i][1] = name;
+                winners[i][2] = time;
+            }
+        }
+    }
+       
     public void displaySeconds(long startTime){
                 long elapsedTime = System.currentTimeMillis() - startTime;
                 long elapsedSeconds = elapsedTime / 1000;
