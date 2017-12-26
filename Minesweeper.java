@@ -20,6 +20,8 @@ import javafx.scene.input.MouseButton;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.util.Duration;
 
 public class Minesweeper extends Application{
@@ -61,16 +63,15 @@ public class Minesweeper extends Application{
     stage.setHeight(500);
     stage.setResizable(false);
     
-    
     setWelcomeScene();
-   
+
     stage.setScene(welcomeScene);
     stage.show();
     }
     
     //Constuct the first scene
     public void setWelcomeScene(){
-        
+        setHighscoreScene();
         VBox menu = new VBox(30);
         menu.setAlignment(Pos.CENTER);
         Label title = new Label("Minesweeper");
@@ -109,11 +110,17 @@ public class Minesweeper extends Application{
 		window.showAndWait();
         });
         Button seeScores = new Button("See Highscores");
-        setHighscoreScene();
-        seeScores.setOnAction(e -> stage.setScene(highscoreScene));
+        
+        seeScores.setOnAction(e -> {
+            
+            
+            stage.setScene(rankingsScene);
+        });
         
         Button quit = new Button("Exit Game");
-        quit.setOnAction(e -> stage.close());
+        quit.setOnAction((ActionEvent e) -> {
+            stage.close();
+        });
         
         menu.getChildren().addAll(title, play, seeScores, quit);
         welcomeScene = new Scene(menu);
@@ -238,19 +245,27 @@ public class Minesweeper extends Application{
     }
     
     public void setHighscoreScene(){
-        VBox ranking = new VBox(30);
+        //Ranking.update();
+        
+        VBox ranking = new VBox();
         
         HelloRankings = new Label("Highscores:");
-        
+        ranking.getChildren().add(HelloRankings);
+            for(int i = 0; i < 2; i++){
+                Label label = new Label();
+                label.setText("olá");
+                ranking.getChildren().add(label);
+            }
         RankingToMenu = new Button("Back to Menu");
         RankingToMenu.setOnAction(e -> {
 			stage.setScene(welcomeScene);
         });
-        ranking.getChildren().addAll(HelloRankings, RankingToMenu);
+        ranking.getChildren().add(RankingToMenu);
         
         ranking.setAlignment(Pos.CENTER);
         
         rankingsScene = new Scene(ranking);
+        
     }
     
     public void setFlag(int hIndex, int vIndex){	
@@ -342,8 +357,8 @@ public class Minesweeper extends Application{
     
     public void win(){
         time = Timer.getText().replace("Time:\n ","").replace(" : ","");
-        
-
+        Ranking.append(name, time);
+        System.out.println(name + " " + time);
     }
        
     public void displaySeconds(long startTime){
