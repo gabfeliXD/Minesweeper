@@ -1,5 +1,3 @@
-import java.util.Random;
-
 import javafx.application.Application;
 
 import javafx.scene.Scene;
@@ -26,115 +24,34 @@ import javafx.util.Duration;
 
 public class Minesweeper extends Application{
     
-    //LOGIGAL STUFF
-    
-    public static int totalMines = 10;
-    public static int horizontalTiles = 10;
-    public static int verticalTiles = 10;
-    public static int[][] mineField;
-    public static Random rand = new Random();
-    public static int[][] flagsMap;
-    public static int flags = totalMines;
-    
-    //Creates the board
-    public static void setBoard(){
-        
-        createBoard();
-         
-        setMines();
-        
-        setNumbers();
-
-	initializeFlagSystem();
-    }
-    
-    //Initialize the board
-    public static void createBoard(){
-        mineField = new int[horizontalTiles][verticalTiles];
-        
-        for (int i = 0; i < horizontalTiles; i++) {
-            for (int j = 0; j < verticalTiles; j++) {
-                mineField[i][j] = 0;
-            }
-        }
-    }
-    
-    //Set the mines in random positions
-    public static void setMines(){
-        for (int i = 0; i < totalMines; i++){
-            
-            int xMine = rand.nextInt(horizontalTiles);
-            int yMine = rand.nextInt(verticalTiles);
-            
-            if (mineField[xMine][yMine] != -1){
-                mineField[xMine][yMine] = -1;
-            }else{
-                i -= 1;
-            }
-        }
-    }
-    
-    //Set the numbers adjacent to the mines 
-    public static void setNumbers(){
-        
-        for (int i = 0; i < horizontalTiles; i++) {
-            for (int j = 0; j < verticalTiles; j++) {
-                
-                if(mineField[i][j] == -1){
-                    
-                    for (int h = i - 1; h <= i + 1; h++) {
-                        for (int v = j - 1; v <= j + 1; v++) {  
-                            
-                            boolean inBoundsX = (h >= 0) && (h < horizontalTiles);
-                            boolean inBoundsY = (v >= 0) && (v < verticalTiles);
-                            
-                            if(inBoundsX && inBoundsY && mineField[h][v] != -1){
-                                mineField[h][v] += 1;
-                            }          
-                        }
-                    }
-                }                          
-            }
-        }
-    }
-
-    //Initialize the flag counter
-    public static void initializeFlagSystem(){
-	flagsMap = new int[horizontalTiles][verticalTiles];
-
-	for (int x = 0; x < horizontalTiles; x++) {
-        	for (int y = 0; y < verticalTiles; y++) {
-            		flagsMap[x][y] = 0;
-	    }
-        }
-	    
-    }    
     
     //Main
     public static void main(String[] args) {
         launch(args);    
     }
     
-    Stage stage;
-    Scene welcomeScene, minesweeperScene, highscoreScene;
+    private Stage stage;
+    private Scene welcomeScene, minesweeperScene, rankingsScene;
     
-    String unrevealedStyle = "-fx-background-color: black; -fx-text-fill: transparent;";
-    String revealedStyle = "";
-    String flagStyle  = "-fx-background-color: red; -fx-text-fill: transparent;";
+    private final String unrevealedStyle = "-fx-background-color: black; -fx-text-fill: transparent;";
+    private final String revealedStyle = "";
+    private final String flagStyle  = "-fx-background-color: red; -fx-text-fill: transparent;";
+    private Button[][] buttons;
     
-    Button[][] buttons;
-    
-    Label flagsHUD;
-    Button resetButton;
-    Boolean Arusure = true;
-    Label Timer;
-    Label Name;
+    private Label flagsHUD;
+    private Button resetButton;
+    private Boolean canAsk;
+    private Label Timer;
+    private Label Name;
 
-    Timeline timeline;
-    long startTime;
+    private Timeline timeline;
+    private long startTime;
                     
-    String name = "";
-    String time = "";
+    private String name = "";
+    private String time = "";
+    
+    Button RankingToMenu;
+    Label HelloRankings;
     
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -159,7 +76,7 @@ public class Minesweeper extends Application{
         Label title = new Label("Minesweeper");
         Button play = new Button("Play");
         play.setOnAction(e -> {
-                setBoard();
+                Board.create();
 		Stage window = new Stage();
 		
 		window.initModality(Modality.APPLICATION_MODAL);
@@ -207,22 +124,24 @@ public class Minesweeper extends Application{
     public void setMinesweeperScene(){
         startTime = System.currentTimeMillis();
 
-        HBox menu = new HBox(10);
-        menu.setPadding(new Insets(20, 20, 5, 20));
-	menu.setSpacing(30);
-	menu.setAlignment(Pos.CENTER);
-        HBox back = new HBox(10);
-	back.setAlignment(Pos.CENTER);
-        back.setPadding(new Insets(5, 20, 20, 20));
+        HBox topMenu = new HBox(10);
+        topMenu.setPadding(new Insets(20, 20, 5, 20));
+	topMenu.setSpacing(30);
+	topMenu.setAlignment(Pos.CENTER);
+        
+        HBox bottomMenu = new HBox(10);
+	bottomMenu.setAlignment(Pos.CENTER);
+        bottomMenu.setPadding(new Insets(5, 20, 20, 20));
+        
         GridPane grid = new GridPane();
         grid.setPadding(new Insets(20, 20, 20, 20));
         grid.setHgap(2);
         grid.setVgap(2);
 
-        buttons = new Button[horizontalTiles][verticalTiles];
+        buttons = new Button[Board.getHTiles()][Board.getVTiles()];
 
-        for (int x = 0; x < horizontalTiles; x++) {
-            for (int y = 0; y < verticalTiles; y++) {
+        for (int x = 0; x < Board.getHTiles(); x++) {
+            for (int y = 0; y < Board.getVTiles(); y++) {
                 Button button = new Button();
                 buttons[x][y] = button;
                 grid.add(button, x, y);
@@ -230,7 +149,7 @@ public class Minesweeper extends Application{
 
                 button.setMinWidth(30);
                 button.setMinHeight(30);
-                String index = String.valueOf(mineField[x][y]);
+                String index = String.valueOf(Board.getContent(x, y));
                 button.setText(index);
 
                 button.setStyle(unrevealedStyle);
@@ -252,18 +171,19 @@ public class Minesweeper extends Application{
         
         resetButton = new Button("Back to Menu"); 
         
-        flagsHUD = new Label("Flags:\n   " + String.valueOf(flags));
+        flagsHUD = new Label("Flags:\n   " + String.valueOf(Board.getFlagCounter()));
         
         Timer = new Label("Time: \n   " + String.valueOf(0) + " : "+ String.valueOf(0));
 
 	Name = new Label("Name:\n   " + name);
 	        
-        Arusure = true;
+        canAsk = true;
+        
 	resetButton.setOnAction(e -> {
 		
-		if(Arusure != true){
+		if(canAsk != true){
 
-           		 setWelcomeScene();
+           		setWelcomeScene();
 			stage.setScene(welcomeScene);
 		}
 		else{
@@ -301,59 +221,56 @@ public class Minesweeper extends Application{
         Button winButton = new Button("win");
         winButton.setOnAction(e -> win());
 
-        menu.getChildren().addAll(flagsHUD, Timer, Name);
-	back.getChildren().addAll(resetButton, winButton);
+        topMenu.getChildren().addAll(flagsHUD, Timer, Name);
+	bottomMenu.getChildren().addAll(resetButton, winButton);
         
-        timeline = new Timeline(new KeyFrame(
-        Duration.millis(1000),
-            ae -> displaySeconds(startTime)));
+        
+        timeline = new Timeline(new KeyFrame(Duration.millis(1000),ae -> displaySeconds(startTime)));  
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
         
         BorderPane border = new BorderPane();
         border.setCenter(grid);
-        border.setTop(menu);
-	border.setBottom(back);
+        border.setTop(topMenu);
+	border.setBottom(bottomMenu);
         minesweeperScene = new Scene(border);
  
     }
     
     public void setHighscoreScene(){
-        VBox highscores = new VBox(30);
+        VBox ranking = new VBox(30);
         
-        Label title = new Label("Highscores:");
+        HelloRankings = new Label("Highscores:");
         
-        highscores.getChildren().add(title);
-        
-        Button backToMenu = new Button("Back to Menu");
-        backToMenu.setOnAction(e -> {
+        RankingToMenu = new Button("Back to Menu");
+        RankingToMenu.setOnAction(e -> {
 			stage.setScene(welcomeScene);
         });
-        highscores.getChildren().add(backToMenu);
+        ranking.getChildren().addAll(HelloRankings, RankingToMenu);
         
-        highscores.setAlignment(Pos.CENTER);
+        ranking.setAlignment(Pos.CENTER);
         
-        highscoreScene = new Scene(highscores);
+        rankingsScene = new Scene(ranking);
     }
     
     public void setFlag(int hIndex, int vIndex){	
-		if(flagsMap[hIndex][vIndex] == 0 && flags <= totalMines && flags > 0){
-			flagsMap[hIndex][vIndex] = 1;	
+		if(!Board.haveFlag(hIndex, vIndex) && Board.getFlagCounter() <= Board.getTotalMines() && Board.getFlagCounter() > 0){
+			Board.placeFlag(hIndex, vIndex);
 			buttons[hIndex][vIndex].setStyle(flagStyle);
-			flags -= 1;
+			Board.updateFlagCounter(-1);
 		}
-		else if(flagsMap[hIndex][vIndex] == 1){
-			flagsMap[hIndex][vIndex] = 0;	
+		else if(Board.haveFlag(hIndex, vIndex)){
+			Board.removeFlag(hIndex, vIndex);		
 			buttons[hIndex][vIndex].setStyle(unrevealedStyle);
-			flags += 1;
+			Board.updateFlagCounter(+1);
 		}
                 
-	flagsHUD.setText("Flags:\n   " + String.valueOf(flags));
+	flagsHUD.setText("Flags:\n   " + String.valueOf(Board.getFlagCounter()));
     }   
 
     public void reveal(String text, int hIndex, int vIndex){
         
-        if(flagsMap[hIndex][vIndex] != 1){
+        if(!Board.haveFlag(hIndex, vIndex)){
             if (!"-1".equals(text)){
 
                 buttons[hIndex][vIndex].setStyle(revealedStyle);
@@ -366,8 +283,8 @@ public class Minesweeper extends Application{
                     for (int h = hIndex - 1; h <= hIndex + 1; h++) {
                         for (int v = vIndex - 1; v <= vIndex + 1; v++) {
 
-                            boolean inBoundsX = (h >= 0) && (h < horizontalTiles);
-                            boolean inBoundsY = (v >= 0) && (v < verticalTiles);
+                            boolean inBoundsX = (h >= 0) && (h < Board.getHTiles());
+                            boolean inBoundsY = (v >= 0) && (v < Board.getVTiles());
 
                             if(inBoundsX && inBoundsY){
                                 buttons[h][v].fire();
@@ -388,22 +305,22 @@ public class Minesweeper extends Application{
     public void checkVictory(){
         int revealedOnes = 0;
         
-        for (int x = 0; x < horizontalTiles; x++) {
-            for (int y = 0; y < verticalTiles; y++) {
+        for (int x = 0; x < Board.getHTiles(); x++) {
+            for (int y = 0; y < Board.getVTiles(); y++) {
                 if (buttons[x][y].getStyle().equals(revealedStyle)){
                     revealedOnes += 1;
                 }
             }
         }
         
-        if(totalMines == (horizontalTiles * verticalTiles - revealedOnes)){
+        if(Board.getTotalMines()== (Board.getHTiles() * Board.getVTiles() - revealedOnes)){
             win();
         }
     }
     
     public void lost(){
-        for (int x = 0; x < horizontalTiles; x++) {
-            for (int y = 0; y < verticalTiles; y++) {
+        for (int x = 0; x < Board.getHTiles(); x++) {
+            for (int y = 0; y < Board.getVTiles(); y++) {
                 buttons[x][y].setStyle(revealedStyle);
                 buttons[x][y].setDisable(true);
                 
@@ -417,7 +334,7 @@ public class Minesweeper extends Application{
                 }
             }
 
-	Arusure = false;
+	canAsk = false;
 	resetButton.setText("Try Again!");
         }
   
@@ -425,7 +342,7 @@ public class Minesweeper extends Application{
     
     public void win(){
         time = Timer.getText().replace("Time:\n ","").replace(" : ","");
-        System.out.println(name + " " +time);
+        
 
     }
        
