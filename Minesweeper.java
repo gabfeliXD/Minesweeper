@@ -82,11 +82,14 @@ public class Minesweeper extends Application{
 		
 		window.initModality(Modality.APPLICATION_MODAL);
 		window.setTitle("Congatulations!");
-		window.setMinWidth(250);
+		window.setWidth(350);
+                window.setHeight(150);
 		
 		Label label = new Label();
 		label.setText("Write Your Name! (Maximum of 3 characters)");
 		TextField textField = new TextField ();
+                textField.setMaxWidth(50);
+                
 		Button closeButton = new Button("Play!");
 		closeButton.setOnAction(a -> {
 		    window.close();
@@ -106,6 +109,8 @@ public class Minesweeper extends Application{
 		layout.setAlignment(Pos.CENTER);
 		
 		Scene scene = new Scene(layout);
+                
+                window.setResizable(false);
 		window.setScene(scene);  
 		window.showAndWait();
         });
