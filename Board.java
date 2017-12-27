@@ -74,6 +74,7 @@ public class Board{
 
     //Initialize the flags
     public static void initializeFlagSystem(){
+        flagCounter = totalMines;
 	flagMap = new boolean[horizontalTiles][verticalTiles];
 
 	for (int x = 0; x < horizontalTiles; x++) {

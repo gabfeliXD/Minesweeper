@@ -21,7 +21,6 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.util.Duration;
 
 public class Minesweeper extends Application{
@@ -59,8 +58,8 @@ public class Minesweeper extends Application{
     public void start(Stage primaryStage) throws Exception {
     stage = primaryStage;
     stage.setTitle("Minesweeper");
-    stage.setWidth(360);
-    stage.setHeight(500);
+    stage.setWidth(480);
+    stage.setHeight(520);
     stage.setResizable(false);
     
     setWelcomeScene();
@@ -75,6 +74,7 @@ public class Minesweeper extends Application{
         VBox menu = new VBox(30);
         menu.setAlignment(Pos.CENTER);
         Label title = new Label("Minesweeper");
+        title.setStyle("-fx-font-size: 60");
         Button play = new Button("Play");
         play.setOnAction(e -> {
                 Board.create();
@@ -144,6 +144,7 @@ public class Minesweeper extends Application{
         grid.setPadding(new Insets(20, 20, 20, 20));
         grid.setHgap(2);
         grid.setVgap(2);
+        grid.setAlignment(Pos.CENTER);
 
         buttons = new Button[Board.getHTiles()][Board.getVTiles()];
 
@@ -225,11 +226,9 @@ public class Minesweeper extends Application{
 	      }
         });
         
-        Button winButton = new Button("win");
-        winButton.setOnAction(e -> win());
 
         topMenu.getChildren().addAll(flagsHUD, Timer, Name);
-	bottomMenu.getChildren().addAll(resetButton, winButton);
+	bottomMenu.getChildren().add(resetButton);
         
         
         timeline = new Timeline(new KeyFrame(Duration.millis(1000),ae -> displaySeconds(startTime)));  
@@ -245,15 +244,15 @@ public class Minesweeper extends Application{
     }
     
     public void setHighscoreScene(){
-        //Ranking.update();
+        Ranking.update();
         
-        VBox ranking = new VBox();
+        VBox ranking = new VBox(20);
         
         HelloRankings = new Label("Highscores:");
         ranking.getChildren().add(HelloRankings);
-            for(int i = 0; i < 2; i++){
+            for(int i = 0; i < 10; i++){
                 Label label = new Label();
-                label.setText("olá");
+                label.setText(Ranking.getWinner(i));
                 ranking.getChildren().add(label);
             }
         RankingToMenu = new Button("Back to Menu");
