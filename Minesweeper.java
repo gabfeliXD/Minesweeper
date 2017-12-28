@@ -94,7 +94,10 @@ public class Minesweeper extends Application{
 		closeButton.setOnAction(a -> {
 		    window.close();
 		    if(textField.getText().length() > 3){
-			name = textField.getText().substring(0,3);
+				if(textField.getText() != ""){
+					name = textField.getText().substring(0,3);
+				}else{
+					name = "   "
 		    }else{
 
 		    name = textField.getText();
@@ -254,10 +257,12 @@ public class Minesweeper extends Application{
         VBox ranking = new VBox(20);
         
         HelloRankings = new Label("Highscores:");
-        ranking.getChildren().add(HelloRankings);
+	Label explainStuff = new Label("Rank - Name - Time");
+        ranking.getChildren().addAll(HelloRankings, explainStuff);
             for(int i = 0; i < 10; i++){
                 Label label = new Label();
-                label.setText(Ranking.getWinner(i));
+		
+                label.setText(Ranking.formatWinner(Ranking.getWinner(i), i));
                 ranking.getChildren().add(label);
             }
         RankingToMenu = new Button("Back to Menu");
@@ -333,7 +338,7 @@ public class Minesweeper extends Application{
         }
         
         if(Board.getTotalMines()== (Board.getHTiles() * Board.getVTiles() - revealedOnes)){
-            win();
+            addPlayerInRank();
         }
     }
     
@@ -356,13 +361,12 @@ public class Minesweeper extends Application{
 	canAsk = false;
 	resetButton.setText("Try Again!");
         }
-  
+  	addPlayerInRank();
     }
     
-    public void win(){
+    public void addPlayerInRank(){
         time = Timer.getText().replace("Time:\n ","").replace(" : ","");
         Ranking.append(name, time);
-        System.out.println(name + " " + time);
     }
        
     public void displaySeconds(long startTime){
@@ -373,5 +377,6 @@ public class Minesweeper extends Application{
         
                 Timer.setText("Time:\n " + String.valueOf(elapsedMinutes) + " : "+ String.valueOf(secondsDisplay));          
     }
+
      
 }
