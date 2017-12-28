@@ -97,7 +97,8 @@ public class Minesweeper extends Application{
 				if(textField.getText() != ""){
 					name = textField.getText().substring(0,3);
 				}else{
-					name = "   "
+					name = "   ";
+				}
 		    }else{
 
 		    name = textField.getText();
@@ -128,6 +129,7 @@ public class Minesweeper extends Application{
         Button quit = new Button("Exit Game");
         quit.setOnAction((ActionEvent e) -> {
             stage.close();
+	    Ranking.writeFile();
         });
         
         menu.getChildren().addAll(title, play, seeScores, quit);
@@ -137,7 +139,7 @@ public class Minesweeper extends Application{
 
     //construct the scene where the thing will truly happen
     public void setMinesweeperScene(){
-        startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis() + 1000;
 
         HBox topMenu = new HBox(10);
         topMenu.setPadding(new Insets(20, 20, 5, 20));
@@ -365,7 +367,10 @@ public class Minesweeper extends Application{
     }
     
     public void addPlayerInRank(){
-        time = Timer.getText().replace("Time:\n ","").replace(" : ","");
+	System.out.print(Timer.getText());	
+        time = Timer.getText().replace("Time:  \n ","").replace(" : ","").replace("Time:", "").replace("\n", "").replace(":","").replace(" ", "");
+	
+	System.out.println(time);	
         Ranking.append(name, time);
     }
        
@@ -375,7 +380,7 @@ public class Minesweeper extends Application{
                 long secondsDisplay = elapsedSeconds % 60;
                 long elapsedMinutes = elapsedSeconds / 60;
         
-                Timer.setText("Time:\n " + String.valueOf(elapsedMinutes) + " : "+ String.valueOf(secondsDisplay));          
+                Timer.setText("Time:\n" + String.valueOf(elapsedMinutes) + " : "+ String.valueOf(secondsDisplay));          
     }
 
      

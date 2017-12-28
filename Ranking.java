@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 public class Ranking{
-	String stuff = "";
+	private static String stuff = "";
     public static void init(){
         if(times.isEmpty()){
             times.add(0, 9999999);
@@ -17,8 +17,8 @@ public class Ranking{
     public static void append(String name, String time){
 
 	 try (BufferedWriter out = new BufferedWriter(new FileWriter("rankings.txt"))) {
-    		out.write(name + " " + time);
-		stuff += name + " " + time + "\n";
+    		out.write(name + "-" + time);
+		stuff += name + "-" + time + "\n";
 	 } catch (IOException e) {
 	        System.out.println(e.getMessage());
 	 }
@@ -38,8 +38,10 @@ public class Ranking{
     		String currentLine;
                         
             while ((currentLine = in.readLine()) != null) {
-                
-                winnerData = currentLine.split(" ");
+                System.out.println(currentLine);
+                winnerData = currentLine.split("-");
+		System.out.println(winnerData[0]);
+		System.out.println(winnerData[1]);
 
 
                 for(int i = 0; i < times.size(); i++){
@@ -97,15 +99,13 @@ public class Ranking{
 		}
 
 		if(text.equals(" - ")){
-			txt = rank + "                 ";
+			txt = rank + "                    ";
 		}
 		return txt;
     }
 	public static void writeFile(){
-		PrintWriter pw = new PrintWriter("filepath.txt");
-		pw.close()
-		try (BufferedWriter out = new BufferedWriter(new FileWriter("rankings.txt"))) {
-    		out.write(stuff);
+		try (BufferedWriter out = new BufferedWriter(new FileWriter("rankings.txt"))) 			 {
+    			out.write(stuff);
 
 		 } catch (IOException e) {
 			System.out.println(e.getMessage());
