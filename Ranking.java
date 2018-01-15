@@ -1,3 +1,4 @@
+//Esse aqui vai se a clase responsável por escrever e ler as coisas no aquivo em que são registrados os players que coseguiram vencer
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -5,8 +6,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import java.util.ArrayList;
+
 public class Ranking{
 	private static String stuff = "";
+	//Esse método vai inicializar o arquivo ra que ele n fique vazio, n sei pq mas se ele fcar vazio da erro
     public static void init(){
         if(times.isEmpty()){
             times.add(0, 9999999);
@@ -14,6 +17,7 @@ public class Ranking{
         }
     }
     
+	//Esse método vai escrever no arquivo o nome e o tempo que forem dados nos argumentos
     public static void append(String name, String time){
 
 	 try (BufferedWriter out = new BufferedWriter(new FileWriter("rankings.txt"))) {
@@ -30,7 +34,8 @@ public class Ranking{
     private static ArrayList<Integer> times = new ArrayList<Integer>();
     private static ArrayList<String> names = new ArrayList<String>();
     private static String[] winnerData;
-    
+
+	//Esse método vai ler o arquvo, e tntão colocar no array os tempos na ordem do menor para o maior.
     public static void update(){
          Ranking.init();
 
@@ -62,7 +67,7 @@ public class Ranking{
 	
     }
     
-    
+    //esse metodo vai pegar o vencedor de ranking correnpndente aos argumentos, tomando cuidad para que esse vencedor n seja o carinha inicial que a gente botou só pr aquivo n ficar vazio
     public static String getWinner(int rank){
         if (rank < times.size()){
              if(times.get(rank) < 99999){
@@ -76,6 +81,7 @@ public class Ranking{
             return(" - ");
         }
     }
+	//E esse vai formatar o tempo direitinho, pra ficar minutos:segundos, pq o tempo inicialmente é só um número avulso que representa os minutos e segunos sem ser fomatdo.
     public static String formatWinner(String text, int rank){
 		String txt;
 		String[] data = new String[3];
@@ -103,6 +109,7 @@ public class Ranking{
 		}
 		return txt;
     }
+	//No final de tudo, pra garantir que os resultados sejam escritos no arquivo para que na proxima vez qu o player for jogar o raning estar lá intacto. 
 	public static void writeFile(){
 		try (BufferedWriter out = new BufferedWriter(new FileWriter("rankings.txt"))) 			 {
     			out.write(stuff);
