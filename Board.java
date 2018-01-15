@@ -11,7 +11,7 @@ public class Board{
     private static Random rand = new Random();
     private static boolean[][] flagMap; // Esse array vai ser responsável por me mostrar onde estão as minhas bandeiras
     
-    //Esse método cria o 
+    //Esse método é o responsável por chamar os outros métodos e criar definitivamente o campo
     public static void create(){
         
         initialize();
@@ -23,7 +23,7 @@ public class Board{
 	initializeFlagSystem();
     }
     
-    //Xreates the Board
+    //Esse método vai inicalizar o mau array de minas, botando zeros em todos os espaços
     public static void initialize(){
         mineField = new int[horizontalTiles][verticalTiles];
         
@@ -34,7 +34,7 @@ public class Board{
         }
     }
     
-    //Set mines in random positions
+    //Esse método vai gerar conjuntos aleatóios de x e y, que vão significar a posição das minas
     public static void setMines(){
         for (int i = 0; i < totalMines; i++){
             
@@ -49,22 +49,38 @@ public class Board{
         }
     }
     
-    //Set the numbers adjacent to the mines 
+    /*Esse método percorrer todo o array, e se verificar que tem alguma mina, 
+    ele vai adicionar os números nos espaços adjacentes, caso não tenham outras minas nesses espaços
+	*/  
     public static void setNumbers(){
         
         for (int i = 0; i < horizontalTiles; i++) {
             for (int j = 0; j < verticalTiles; j++) {
-                
+                //Verificando o array
                 if(mineField[i][j] == -1){
-                    
+                    //Caso encontre uma mina
                     for (int h = i - 1; h <= i + 1; h++) {
                         for (int v = j - 1; v <= j + 1; v++) {  
-                            
+                            //Ele vai percorrer desde a posição (mina-1, mina-1) até a (mina+1, mina+1)
+				/*(Xmina-1, Ymina-1)->OOO
+						      OXO
+						      OOO<-(Xmina+1, Ymina+1)*/
                             boolean inBoundsX = (h >= 0) && (h < horizontalTiles);
                             boolean inBoundsY = (v >= 0) && (v < verticalTiles);
-                            
+                            //Então ele vai verificar se o valor ainda fica destro do array, pro caso de
+				/*(Xmina-1, Ymina-1)->0OOO
+						      0XOO
+						      0OOO<-(Xmina+1, Ymina+1)
+				
+				X -  mina
+				O - espaço dentro do array (entre 0 e array.length()-1)
+				0 - espaço fora do array
+				*/
                             if(inBoundsX && inBoundsY && mineField[h][v] != -1){
                                 mineField[h][v] += 1;
+				    /*Se tiver tudo certo e não tiver uma mina perto (não quer dizer que não se colocará
+				    numeros se duas minas estiverem perto, mas sim que checará antes de se por o número 
+				    pra n sobreescrever a posição da mina pondo o numero em cima dela*/
                             }          
                         }
                     }
@@ -73,7 +89,7 @@ public class Board{
         }
     }
 
-    //Initialize the flags
+    //Esse método vai preencher todas as posições das bandeiras com "false" o que significa que não tem bandeiras lá
     public static void initializeFlagSystem(){
         flagCounter = totalMines;
 	flagMap = new boolean[horizontalTiles][verticalTiles];
@@ -87,7 +103,7 @@ public class Board{
     }
 
     
-    
+    //Getters e Setters
     public static int getTotalMines() {
         return totalMines;
     }
@@ -102,6 +118,7 @@ public class Board{
     
     public static int getFlagCounter() {
         return flagCounter;
+	
     }
 
     public static void updateFlagCounter(int flag) {
