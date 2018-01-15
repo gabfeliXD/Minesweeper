@@ -80,7 +80,8 @@ public class Board{
                                 mineField[h][v] += 1;
 				    /*Se tiver tudo certo e não tiver uma mina perto (não quer dizer que não se colocará
 				    numeros se duas minas estiverem perto, mas sim que checará antes de se por o número 
-				    pra n sobreescrever a posição da mina pondo o numero em cima dela*/
+				    pra n sobreescrever a posição da mina pondo o numero em cima dela) então os números serão coolocados
+				    e caso já estejam presentes(que seria o caso de terem duas minas próximas) vão aumentar*/
                             }          
                         }
                     }
@@ -120,23 +121,23 @@ public class Board{
         return flagCounter;
 	
     }
-
+	//Esse método aumenta/diminui o contador de bandeiras, com base no argumento
     public static void updateFlagCounter(int flag) {
        Board.flagCounter += flag;
     }
-
+	//Esse retorna o conteúdo de uma determinada posição no campo, com base nos argumentos
     public static int getContent(int x, int y) {
         return mineField[x][y];
     }
-
+	//Esse checa se tem uma bandeira em uma certa posisão no campo com base nos argumentos 
     public static boolean haveFlag(int x, int y) {
         return flagMap[x][y];
     }
-    
+    //Esse bota a bandeira
     public static void placeFlag(int x, int y) {
         flagMap[x][y] = true;
     }
-    
+    //Esse tira
     public static void removeFlag(int x, int y) {
         flagMap[x][y] = false;
     }
