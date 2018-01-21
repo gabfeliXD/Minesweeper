@@ -1,17 +1,16 @@
-// Aqui é onde as coisa "lógicas" acontecem
+
 import java.util.Random;
 
 public class Board{
-    private static int totalMines = 10; // O número total de minas
-   private static int horizontalTiles = 10; // O tamanho horizontal do campo
-    private static int verticalTiles = 10; // O tamanho vertical do campo
-    private static int flagCounter = totalMines; // Inicializando a variável que vai contar as "bandeiras"
+    private static int totalMines = 10;
+   private static int horizontalTiles = 10; 
+    private static int verticalTiles = 10; 
+    private static int flagCounter = totalMines; 
     
-    private static int[][] mineField; // Esse array vai ser responsável por me mostrar onde estão as minhas minas e os meus múmeros
+    private static int[][] mineField;
     private static Random rand = new Random();
-    private static boolean[][] flagMap; // Esse array vai ser responsável por me mostrar onde estão as minhas bandeiras
-    
-    //Esse método cria o 
+    private static boolean[][] flagMap; 
+   
     public static void create(){
         
         initialize();
